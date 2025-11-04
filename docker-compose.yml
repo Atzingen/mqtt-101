@@ -1,0 +1,31 @@
+services:
+  emqx:
+    image: emqx/emqx:5.8.6   # or "latest"
+    container_name: emqx
+    restart: unless-stopped
+    ports:
+      - "1883:1883"    # MQTT
+      - "8883:8883"    # MQTT TLS (configure certs later)
+      - "8083:8083"    # WebSocket
+      - "8084:8084"    # WebSocket TLS
+      - "18083:18083"  # Dashboard
+    environment:
+      EMQX_DASHBOARD__DEFAULT_USERNAME: admin
+      EMQX_DASHBOARD__DEFAULT_PASSWORD: public
+      EMQX_ALLOW_ANONYMOUS: "true"
+      # EMQX_AUTH__USER__1__USERNAME: user1
+      # EMQX_AUTH__USER__1__PASSWORD: secret
+    volumes:
+      - emqx_data:/opt/emqx/data
+      - emqx_log:/opt/emqx/log
+
+  mqtt-client:
+    image: efrecon/mqtt-client
+    container_name: mqtt-client
+    depends_on:
+      - emqx
+    entrypoint: ["sleep","infinity"]
+
+volumes:
+  emqx_data:
+  emqx_log:
